@@ -78,7 +78,7 @@ typedef struct SDL_EGL_VideoData
     EGLBoolean(EGLAPIENTRY *eglWaitGL)(void);
     
     EGLBoolean(EGLAPIENTRY *eglBindAPI)(EGLenum);
-
+    EGLBoolean(EGLAPIENTRY *eglSurfaceAttrib) (EGLDisplay display, EGLSurface surface, EGLint attribute, EGLint value);
 } SDL_EGL_VideoData;
 
 /* OpenGLES functions */

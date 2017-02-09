@@ -265,7 +265,7 @@ SDL_EGL_LoadLibrary(_THIS, const char *egl_path, NativeDisplayType native_displa
     LOAD_FUNC(eglWaitGL);
     LOAD_FUNC(eglBindAPI);
     LOAD_FUNC(eglQueryString);
-    
+    LOAD_FUNC(eglSurfaceAttrib);
 #if !defined(__WINRT__)
     _this->egl_data->egl_display = _this->egl_data->eglGetDisplay(native_display);
     if (!_this->egl_data->egl_display) {
@@ -607,12 +607,17 @@ SDL_EGL_CreateSurface(_THIS, NativeWindowType nw)
 
         ANativeWindow_setBuffersGeometry(nw, 0, 0, format);
     }
-#endif    
-    
-    return _this->egl_data->eglCreateWindowSurface(
-            _this->egl_data->egl_display,
-            _this->egl_data->egl_config,
-            nw, NULL);
+#endif
+
+    EGLSurface surface = _this->egl_data->eglCreateWindowSurface(
+                          _this->egl_data->egl_display,
+                          _this->egl_data->egl_config,
+                          nw, NULL);
+
+    if (_this->egl_data->eglSurfaceAttrib(_this->egl_data->egl_display, surface, EGL_SWAP_BEHAVIOR, EGL_BUFFER_PRESERVED) == EGL_FALSE)
+        printf("Cannot set EGL_BUFFER_PRESERVED\n");
+
+    return surface;
 }
 
 void
