@@ -2972,6 +2972,9 @@ SDL_GL_SetAttribute(SDL_GLattr attr, int value)
     case SDL_GL_RETAINED_BACKING:
         _this->gl_config.retained_backing = value;
         break;
+    case SDL_GL_PRESERVE_BUFFER:
+        _this->gl_config.preserve_buffer = value;
+        break;
     case SDL_GL_CONTEXT_MAJOR_VERSION:
         _this->gl_config.major_version = value;
         break;
@@ -3799,3 +3802,4 @@ float SDL_ComputeDiagonalDPI(int hpix, int vpix, float hinches, float vinches)
 }
 
 /* vi: set ts=4 sw=4 expandtab: */
+

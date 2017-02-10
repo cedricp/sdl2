@@ -614,8 +614,12 @@ SDL_EGL_CreateSurface(_THIS, NativeWindowType nw)
                           _this->egl_data->egl_config,
                           nw, NULL);
 
-    if (_this->egl_data->eglSurfaceAttrib(_this->egl_data->egl_display, surface, EGL_SWAP_BEHAVIOR, EGL_BUFFER_PRESERVED) == EGL_FALSE)
-        printf("Cannot set EGL_BUFFER_PRESERVED\n");
+    if (surface && _this->gl_config.preserve_buffer){
+        if (_this->egl_data->eglSurfaceAttrib(_this->egl_data->egl_display,
+                                              surface, EGL_SWAP_BEHAVIOR,
+                                              EGL_BUFFER_PRESERVED) == EGL_FALSE)
+            printf("Cannot set EGL_BUFFER_PRESERVED\n");
+    }
 
     return surface;
 }
@@ -636,3 +640,4 @@ SDL_EGL_DestroySurface(_THIS, EGLSurface egl_surface)
 
 /* vi: set ts=4 sw=4 expandtab: */
     
+

@@ -199,7 +199,8 @@ typedef enum
     SDL_GL_CONTEXT_PROFILE_MASK,
     SDL_GL_SHARE_WITH_CURRENT_CONTEXT,
     SDL_GL_FRAMEBUFFER_SRGB_CAPABLE,
-    SDL_GL_CONTEXT_RELEASE_BEHAVIOR
+    SDL_GL_CONTEXT_RELEASE_BEHAVIOR,
+    SDL_GL_PRESERVE_BUFFER
 } SDL_GLattr;
 
 typedef enum
@@ -1198,3 +1199,4 @@ extern DECLSPEC void SDLCALL SDL_GL_DeleteContext(SDL_GLContext context);
 #endif /* _SDL_video_h */
 
 /* vi: set ts=4 sw=4 expandtab: */
+
