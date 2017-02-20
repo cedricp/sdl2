@@ -324,6 +324,7 @@ struct SDL_VideoDevice
         int release_behavior;
         int framebuffer_srgb_capable;
         int retained_backing;
+        int preserve_buffer;
         int driver_loaded;
         char driver_path[256];
         void *dll_handle;

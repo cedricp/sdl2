@@ -40,10 +40,10 @@
 
 #if SDL_VIDEO_DRIVER_RPI
 /* Raspbian places the OpenGL ES/EGL binaries in a non standard path */
-#define DEFAULT_EGL "/opt/vc/lib/libEGL.so"
-#define DEFAULT_OGL_ES2 "/opt/vc/lib/libGLESv2.so"
-#define DEFAULT_OGL_ES_PVR "/opt/vc/lib/libGLES_CM.so"
-#define DEFAULT_OGL_ES "/opt/vc/lib/libGLESv1_CM.so"
+#define DEFAULT_EGL "/usr/lib/libEGL.so"
+#define DEFAULT_OGL_ES2 "/usr/lib/libGLESv2.so"
+#define DEFAULT_OGL_ES_PVR "/usr/lib/libGLES_CM.so"
+#define DEFAULT_OGL_ES "/usr/lib/libGLESv1_CM.so"
 
 #elif SDL_VIDEO_DRIVER_ANDROID || SDL_VIDEO_DRIVER_VIVANTE
 /* Android */
@@ -591,6 +591,7 @@ SDL_EGL_DeleteContext(_THIS, SDL_GLContext context)
 EGLSurface *
 SDL_EGL_CreateSurface(_THIS, NativeWindowType nw) 
 {
+    EGLSurface *surface;
     if (SDL_EGL_ChooseConfig(_this) != 0) {
         return EGL_NO_SURFACE;
     }
@@ -609,7 +610,7 @@ SDL_EGL_CreateSurface(_THIS, NativeWindowType nw)
     }
 #endif
 
-    EGLSurface surface = _this->egl_data->eglCreateWindowSurface(
+    surface = _this->egl_data->eglCreateWindowSurface(
                           _this->egl_data->egl_display,
                           _this->egl_data->egl_config,
                           nw, NULL);
