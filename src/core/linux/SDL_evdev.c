@@ -44,7 +44,9 @@ static _THIS = NULL;
 #include <linux/kd.h>
 #include <linux/keyboard.h>
 #endif
-
+#ifdef SDL_INPUT_TSLIB
+#include <tslib.h>
+#endif
 
 /* We need this to prevent keystrokes from appear in the console */
 #ifndef KDSKBMUTE
@@ -452,13 +454,59 @@ int
 SDL_EVDEV_Init(void)
 {
     int retval = 0;
+#ifdef SDL_INPUT_TSLIB
+    const char *mousedev;
+    const char *mousedrv;
+    int ts_mouse_fd = -1;
+    struct tsdev* ts_dev;
     
+    mousedrv = SDL_getenv("SDL_MOUSEDRV");
+    mousedev = SDL_getenv("SDL_MOUSEDEV");
+#endif
+
     if (_this == NULL) {
         
         _this = (SDL_EVDEV_PrivateData *) SDL_calloc(1, sizeof(*_this));
         if(_this == NULL) {
             return SDL_OutOfMemory();
         }
+
+#ifdef SDL_INPUT_TSLIB
+    if ( mousedrv && (SDL_strcmp(mousedrv, "TSLIB") == 0) ) {
+        if (mousedev == NULL) mousedev = SDL_getenv("TSLIB_TSDEVICE");
+        if (mousedev != NULL) {
+            ts_dev = ts_open(mousedev, 1);
+            if ((ts_dev != NULL) && (ts_config(ts_dev) >= 0)) {
+                ts_mouse_fd = ts_fd(ts_dev);
+            }
+        }
+    }
+
+    if (ts_mouse_fd != -1){
+        SDL_evdevlist_item *item;
+        item = (SDL_evdevlist_item *) SDL_calloc(1, sizeof (SDL_evdevlist_item));
+        if (item == NULL) {
+            return SDL_OutOfMemory();
+        }
+
+        item->fd = ts_mouse_fd;
+        item->ts_dev = ts_dev;
+        item->path = SDL_strdup(mousedev);
+        if (item->path == NULL) {
+            close(item->fd);
+            SDL_free(item);
+            return SDL_OutOfMemory();
+        }
+
+        if (_this->last == NULL) {
+            _this->first = _this->last = item;
+        } else {
+            _this->last->next = item;
+            _this->last = item;
+        }
+        SDL_EVDEV_sync_device(item);
+    }
+#endif
 
 #if SDL_USE_LIBUDEV
         if (SDL_UDEV_Init() < 0) {
@@ -594,6 +642,24 @@ SDL_EVDEV_Poll(void)
     mouse = SDL_GetMouse();
 
     for (item = _this->first; item != NULL; item = item->next) {
+#ifdef SDL_INPUT_TSLIB
+        if (item->ts_dev){
+            SDL_Mouse* mouse = SDL_GetMouse();
+            struct ts_sample sample;
+
+            while (ts_read(item->ts_dev, &sample, 1) > 0) {
+                int button = (sample.pressure > 0) ? 1 : 0;
+                int old_mouse_state = (mouse->buttonstate & SDL_BUTTON_LEFT) > 0 ? 1 : 0;
+
+                if ( old_mouse_state != button ){
+                    SDL_SendMouseButton(mouse->focus, mouse->mouseID, button ? SDL_PRESSED : SDL_RELEASED, SDL_BUTTON_LEFT);
+                }
+
+                SDL_SendMouseMotion(mouse->focus, mouse->mouseID, SDL_FALSE, sample.x, sample.y);
+            }
+            continue;
+        }
+#endif
         while ((len = read(item->fd, events, (sizeof events))) > 0) {
             len /= sizeof(events[0]);
             for (i = 0; i < len; ++i) {
@@ -805,4 +871,5 @@ SDL_EVDEV_device_removed(const char *devpath)
 #endif /* SDL_INPUT_LINUXEV */
 
 /* vi: set ts=4 sw=4 expandtab: */
+
 

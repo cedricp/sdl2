@@ -2838,7 +2838,7 @@ dnl Set up the configuration based on the host platform!
 case "$host" in
     *-*-linux*|*-*-uclinux*|*-*-gnu*|*-*-k*bsd*-gnu|*-*-bsdi*|*-*-freebsd*|*-*-dragonfly*|*-*-netbsd*|*-*-openbsd*|*-*-sysv5*|*-*-solaris*|*-*-hpux*|*-*-aix*|*-*-minix*)
         case "$host" in
-            *-raspberry-linux*)
+            *-raspberry-linux*|*-openbricks-linux*)
                 # Raspberry Pi
                 ARCH=linux
                 RPI_CFLAGS="-I/opt/vc/include -I/opt/vc/include/interface/vcos/pthreads -I/opt/vc/include/interface/vmcs_host/linux"
@@ -3673,6 +3673,11 @@ if test x$enable_libudev = xyes; then
     SUMMARY="${SUMMARY}Using libudev   : YES\n"
 else
     SUMMARY="${SUMMARY}Using libudev   : NO\n"
+fi
+if test x$enable_input_tslib = xyes; then
+    SUMMARY="${SUMMARY}Using libts     : YES\n"
+else
+    SUMMARY="${SUMMARY}Using libts     : NO\n"
 fi
 if test x$have_dbus_dbus_h_hdr = xyes; then
     SUMMARY="${SUMMARY}Using dbus      : YES\n"

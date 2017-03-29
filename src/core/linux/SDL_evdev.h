@@ -29,10 +29,15 @@
 #include "SDL_events.h"
 #include <sys/stat.h>
 
+struct tsdev;
+
 typedef struct SDL_evdevlist_item
 {
     char *path;
     int fd;
+#ifdef SDL_INPUT_TSLIB
+    struct tsdev* ts_dev;
+#endif
     struct SDL_evdevlist_item *next;
 } SDL_evdevlist_item;
 
@@ -57,3 +62,4 @@ extern void SDL_EVDEV_Poll(void);
 #endif /* _SDL_evdev_h */
 
 /* vi: set ts=4 sw=4 expandtab: */
+
