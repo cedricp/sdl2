@@ -652,11 +652,12 @@ SDL_EVDEV_Poll(void)
                 int button = (sample.pressure > 0) ? 1 : 0;
                 int old_mouse_state = (mouse->buttonstate & SDL_BUTTON_LEFT) > 0 ? 1 : 0;
 
+                SDL_SendMouseMotion(mouse->focus, mouse->mouseID, SDL_FALSE, sample.x, sample.y);
+
                 if ( old_mouse_state != button ){
                     SDL_SendMouseButton(mouse->focus, mouse->mouseID, button ? SDL_PRESSED : SDL_RELEASED, SDL_BUTTON_LEFT);
                 }
 
-                SDL_SendMouseMotion(mouse->focus, mouse->mouseID, SDL_FALSE, sample.x, sample.y);
             }
             continue;
         }
